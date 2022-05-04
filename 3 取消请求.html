@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+   
+
+</head>
+<body>
+
+    <!-- 设置两个按钮 -->
+    <button class="send">发送请求</button>
+    <button class="cancel">取消请求</button>
+
+    <style>
+        /* 两个按钮的样式初始化一下 */
+        button {
+            width: 90px;
+            height: 30px;
+            display: inline-block;
+            color: white;
+        }
+        .send {
+            background-color: skyblue;
+        }
+        .cancel {
+            background-color: red;
+        }
+
+    </style>
+    <script>
+        // 当在请求服务器过程中, 发出请求但是还未返回响应结果时, 取消该请求
+        // 这一般用作防止用户多次请求服务器造成服务器压力过大
+
+        // 本实验目的: 
+        // 两个按钮, 一个发送请求一个取消请求
+        // 目的1:
+        // 当点击发送请求后, 当服务器未返回结果时点击取消请求按钮, 以取消该请求 
+        // 
+        // 目的2:
+        // 当用户多次点击发起请求按钮时, 每次都检查上一个请求是否完成
+        // 如果完成则继续请求, 
+        // 如果还未完成则取消上一次请求, 然后继续发送请求
+        // 
+        // 本实验效果
+        // 防止短时间内多次的重复请求服务器, 造成服务器压力过大
+
+        // 如何判断发送完成或仍然在发送中
+        // 使用浏览器打开本实验, 按f12打开控制台, 点击Network
+        // 点击发送请求, 出现一行, name为index, status一开始为pending然后变为200
+        // pending表示在请求中, 200或返回其他数字则表示收到服务器返回结果, cancel表示该请求被取消
+
+        // 设置取消变量
+        let cancel = null;
+
+        // 获取两个按钮
+        const btns = document.querySelectorAll('button');
+
+        // 发送请求按钮, 点击时发送请求
+        btns[0].onclick = function(){
+
+            // 第一遍阅读请先忽略此处, 读完一遍后再看该if语句
+            // 当点击发送按钮时, 如果cancel不为null则表示仍有一个请求正在进行中
+            // 此时cancel保存的是上一个请求, 调用他则调用了取消上一个请求的函数, 将上一个请求终止后再继续进行本次请求
+            if(cancel!==null){
+                cancel();
+            }
+
+            const instance = axios.create({
+                timeout:2000,
+                method:'get',
+                baseURL:'https://api.shop.eduwork.cn'
+            });
+
+            instance({
+                url:'/api/index',
+
+                // 这里c相当于一个函数, 调用此函数则取消请求, 使用我们的全局变量cancel保存这个函数
+                // 然后可以在其他地方使用这个函数以取消该请求
+                cancelToken: new axios.CancelToken((c)=>{
+                    cancel = c;
+                })
+            }).then(res=>{
+                console.log(res);
+
+                // 执行到这里的时候代表该请求已经全部完成
+                // 这时候初始化cancel为null
+                cancel = null;
+
+            });
+
+        }
+
+        // 取消按钮, 先点发送请求按钮, 然后快速点取消请求按钮, 调用刚刚保存的取消请求函数以达到取消刚才那个请求的目的
+        btns[1].onclick = function(){
+
+            // 如果cancel为null则表示没有请求在进行中, 提示
+            if(cancel === null){
+                alert("没有正在发送的请求!");
+            }
+            else    // 否则有请求在进行中, 终止该请求并初始化cancel
+            {
+                cancel();
+                cancel = null;
+            }
+        }
+
+
+    </script>
+
+    
+</body>
+</html>
