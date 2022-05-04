@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<script>
+
+    // axios自身相当于一个对象
+
+    // axios.create(obj)    这里的create函数会重写axios对象中的一些属性, 根据obj的内容重写, 然后创建重写后的对象再返回
+    
+    const instance = axios.create({
+        baseURL: 'https://api.shop.eduwork.cn',        // 基础url
+        timeout: 2000,       // 超时时间设置, 超过这个时间则认为请求失败, 取消请求
+        method:'get'
+    });
+
+
+    // instance(obj) 相当于启动函数, 使用他会利用obj中的内容进行属性重写后再开始发送请求
+
+    // 刚才只设置了baseURL, 其作用是为了一个源中的不同接口, baseURL+url才是完整的url, 当然也可以直接使用完整的url
+    instance({
+        url:'/api/index'        // 会将baseURL与url拼接, 相当于访问 http://localhost:3000/posts
+    }).then(response=>{
+        // 发送请求成功的话, 服务器返回结果, response 则代表返回的结果, response是个参数名,可以随意设置
+
+        // 返回的内容的结构可以在github上axios的官网中查看
+        // 百度也行, 百度"axios响应结果的结构"
+        console.log(response);      // 输出查看返回的结果
+        
+    }).catch(error=>{
+        // 失败的话则会调用这里的内容
+        console.log(error);
+    })
+
+
+
+</script>
+
+
+
+    
+</body>
+</html>
