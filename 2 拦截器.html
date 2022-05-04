@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<script>
+
+    const instance = axios.create({
+        baseURL: 'https://api.shop.eduwork.cn',
+        timeout: 2000
+    });
+
+    // 创建拦截器
+
+    // 发送请求前可以使用这个进行处理发送的信息, 也就是instance对象中的一些属性如url, method, timeout等
+    // 这里的config就是instance里的这些属性的一个集合, 这里修改config.timeout就相当于修改instance中的timeout
+    instance.interceptors.request.use(config => {
+        // Do something before request is sent
+        config.timeout = 3000;      // 响应时间被更改为3000ms
+
+        return config;
+    },error => {
+        // Do something with request error
+        return Promise.reject(error);
+    });
+
+    // 响应返回处理前
+    instance.interceptors.response.use(response => {
+        // Do something before response is sent
+
+        // 后续处理只用到data里的内容, 则在这里可以直接将放回的响应结果设置为原本响应结果的data里的内容
+        return response.data;
+    },error => {
+        // Do something with response error
+        return Promise.reject(error);
+    });
+
+    // 发送请求
+    instance({
+        url:'/api/index',
+        method:'get'
+    }).then(res=>{
+
+        console.log(res);
+    }).catch(err=>{
+        console.log(err);
+    })
+    
+
+
+
+</script>
+</body>
+</html>
